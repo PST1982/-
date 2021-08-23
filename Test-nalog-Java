@@ -1,0 +1,103 @@
+package pars_jsoup;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import junit.framework.Assert;
+@TestInstance(Lifecycle.PER_CLASS)
+class nalog_test1 {
+	String URL = "https://www.nalog.ru/";
+	WebDriver browser = new ChromeDriver();
+	
+	/*@BeforeAll
+	public void Browser() {
+		browser.get(URL);
+		browser.manage().window().maximize();
+	}*/
+	
+	@BeforeEach
+	public void Begin() {
+		browser.get(URL);
+		browser.manage().window().maximize();
+	}
+	@AfterEach
+	public void Back() {
+		browser.navigate().forward();
+	}
+	@AfterAll
+	public void Quit() {
+		browser.quit();
+	}
+	@Test
+	void test_title() {		
+		String result = browser.getTitle();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		assertEquals("Федеральная налоговая служба", result);
+	}
+	
+	@Test
+	public void test_cabinet() {
+		browser.findElement(By.cssSelector(".main-menu__enter")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		String result = browser.findElement(By.cssSelector(".white-block.main-page_form h2")).getText();
+		assertEquals("Вход в личный кабинет", result);
+	}
+	@Test
+	public void test_demo() {
+		browser.findElement(By.cssSelector(".main-menu__enter")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		browser.findElement(By.cssSelector(".button__outline-white")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		String result = browser.findElement(By.linkText("Иванов Иван Иванович")).getText();
+		assertEquals("Иванов Иван Иванович", result);
+	}
+	@Test
+	public void test_razmer_photo() {
+		browser.findElement(By.cssSelector(".main-menu__enter")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		browser.findElement(By.cssSelector(".button__outline-white")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		//забираем размер картинки
+		int width=browser.findElement(By.cssSelector(".src-modules-App-components-UserInfo-UserInfo-module__photo")).getSize().getWidth();
+	      	int height=browser.findElement(By.cssSelector(".src-modules-App-components-UserInfo-UserInfo-module__photo")).getSize().getHeight();
+
+	      //System.out.println(width +"x"+height);
+	      assertEquals(31,width);
+	      assertEquals(31,height);
+	}
+	@Test
+	public void test_sum_k_oplate( ) {
+		browser.findElement(By.cssSelector(".main-menu__enter")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		browser.findElement(By.cssSelector(".button__outline-white")).click();
+		browser.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		//забираем текст, убираем пробелы, заменяем ".00" на пустоту
+		String res = browser.findElement(By.cssSelector(".nowrap.main-page_title_sum")).getText().replaceAll("\\s+","").replace(".00", "");
+		//переводим строку в int
+		int rez = Integer.parseInt(res.trim());
+		//System.out.println(rez);
+		//проверка условия
+		if (rez < 200000) {
+			assertEquals(rez,rez);
+		}
+		else {
+			assertEquals(200000,rez);
+		}
+	}	
+}
