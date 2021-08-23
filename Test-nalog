@@ -1,0 +1,103 @@
+using NUnit.Framework;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.IE;
+using OpenQA.Selenium.Support.UI;
+using System;
+
+namespace Test_Nalog
+{
+    [TestFixture]
+    public class Tests
+    {
+        //IWebDriver browser = new ChromeDriver();
+        IWebDriver browser = new InternetExplorerDriver();
+        String URL = "https://www.nalog.ru/";
+        // [OneTimeSetUp]  вызывается перед началом запуска всех тестов
+        //перед каждым тестом
+        [SetUp]
+        public void Begin()
+        {
+            browser.Navigate().GoToUrl(URL);
+        }
+        //после каждого теста
+        [TearDown]
+        public void Back()
+        {
+            browser.Navigate().Back();
+        }
+        //после всех тестов
+        [OneTimeTearDown]
+        public void Browser_close()
+        {
+            browser.Close();
+        }
+
+        [Test]
+        public void test_title()
+        {
+            String result = browser.Title;          
+            Assert.AreEqual("Федеральная налоговая служба", result);
+           // browser.Quit();
+        }
+        
+        [Test]
+        public void test_cabinet()
+        {
+            browser.FindElement(By.CssSelector(".main-menu__enter")).Click();
+            //String result = browser.FindElement(By.CssSelector(".white - block.main - page_form h2")).Text;
+            //String result = browser.FindElement(By.PartialLinkText("Вход в личный кабинет")).Text;
+            String result = browser.FindElement(By.XPath("//div/h2")).Text;
+            Assert.AreEqual("Вход в личный кабинет", result);
+            //browser.Quit();
+        }
+
+        [Test]
+        public void test_demo()
+        {
+            browser.FindElement(By.CssSelector(".main-menu__enter")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            browser.FindElement(By.CssSelector(".button__outline-white")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            String result = browser.FindElement(By.LinkText("Иванов Иван Иванович")).Text;
+            Assert.AreEqual("Иванов Иван Иванович", result);
+        }
+
+        [Test]
+        public void test_razmer_photo()
+        {
+            browser.FindElement(By.CssSelector(".main-menu__enter")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            browser.FindElement(By.CssSelector(".button__outline-white")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            //Size.Width.Height забираем размер фото
+            int width = browser.FindElement(By.CssSelector(".src-modules-App-components-UserInfo-UserInfo-module__photo")).Size.Width;
+            int height = browser.FindElement(By.CssSelector(".src-modules-App-components-UserInfo-UserInfo-module__photo")).Size.Height;
+            // Console.WriteLine(width + "x" + height);
+            Assert.AreEqual(31, width);
+            Assert.AreEqual(31, height);
+        }
+       
+        [Test]
+        public void test_sum_k_oplate()
+        {
+            browser.FindElement(By.CssSelector(".main-menu__enter")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            browser.FindElement(By.CssSelector(".button__outline-white")).Click();
+            browser.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            //Replace убираем пробелы и нули
+            String res = browser.FindElement(By.CssSelector(".nowrap.main-page_title_sum")).Text.Replace(".00", "").Replace(" ", "");
+            // int.Parse() приводим к числу int
+            int result = int.Parse(res);
+            if (result < 200000)
+            {
+                Assert.AreEqual(result, result);
+            }
+            else
+            {
+                Assert.AreEqual(200000, result);
+            }
+
+        }
+    }
+}
